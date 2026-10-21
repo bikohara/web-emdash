@@ -1,13 +1,14 @@
-import node from "@astrojs/node";
+import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { defineConfig, fontProviders } from "astro/config";
-import emdash, { local } from "emdash/astro";
-import { sqlite } from "emdash/db";
+import emdash, { cloudflareD1, cloudflareR2 } from "emdash/astro";
 
 export default defineConfig({
 	output: "server",
-	adapter: node({
-		mode: "standalone",
+	adapter: cloudflare({
+		platformProxy: {
+			enabled: true,
+		},
 	}),
 	image: {
 		layout: "constrained",
@@ -16,9 +17,11 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
-			database: sqlite({ url: "file:./data.db" }),
-			storage: local({
-				directory: "./uploads",
+			database: cloudflareD1({
+				binding: "DB"
+			}),
+			storage: cloudflareR2({
+				binding: "MEDIA",
 				baseUrl: "/_emdash/api/media/file",
 			}),
 		}),
@@ -28,7 +31,7 @@ export default defineConfig({
 			provider: fontProviders.google(),
 			name: "Playfair Display",
 			cssVariable: "--font-heading",
-			weights: [400, 500, 600, 700],
+			weights:,
 			fallbacks: ["serif"],
 		},
 	],
